@@ -1,0 +1,12 @@
+"use client";
+import {useState} from "react";
+export function SetupWizard({shopId}:{shopId:string}){
+ const [step,setStep]=useState(1); const [busy,setBusy]=useState(false);
+ async function saveService(form:FormData){setBusy(true);const r=await fetch("/api/services",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({shopId,name:form.get("name"),durationMinutes:Number(form.get("duration")),bufferMinutes:Number(form.get("buffer")),priceCents:Math.round(Number(form.get("price"))*100)})});setBusy(false);if(r.ok)setStep(2)}
+ return <div className="setupWizard"><div className="setupProgress">{[1,2,3,4].map(n=><div key={n} className={n<=step?"active":""}><span>{n}</span><small>{["Serviço","Equipe","Horário","Publicar"][n-1]}</small></div>)}</div>
+  {step===1&&<form className="card setupCard" action={saveService}><h2>Cadastre seu primeiro serviço</h2><p className="muted">Isso já alimenta sua agenda pública.</p><div className="form"><div className="field"><label>Serviço</label><input name="name" defaultValue="Corte masculino" required/></div><div className="twocol"><div className="field"><label>Duração</label><input name="duration" type="number" defaultValue="30"/></div><div className="field"><label>Intervalo</label><input name="buffer" type="number" defaultValue="5"/></div></div><div className="field"><label>Preço R$</label><input name="price" type="number" step=".01" defaultValue="40"/></div><button className="btn primary" disabled={busy}>Salvar e continuar</button></div></form>}
+  {step===2&&<div className="card setupCard"><h2>Monte sua equipe</h2><p className="muted">Você pode convidar agora ou começar sozinho.</p><div className="wizardActions"><button className="btn" onClick={()=>setStep(1)}>Voltar</button><button className="btn primary" onClick={()=>setStep(3)}>Começar sozinho</button></div></div>}
+  {step===3&&<div className="card setupCard"><h2>Defina seu expediente</h2><p className="muted">A jornada poderá ser refinada individualmente depois.</p><div className="wizardActions"><button className="btn" onClick={()=>setStep(2)}>Voltar</button><button className="btn primary" onClick={()=>setStep(4)}>Usar seg–sex, 09:00–19:00</button></div></div>}
+  {step===4&&<div className="card setupCard"><div className="doneIcon">✓</div><h2>Sua barbearia está pronta para publicar</h2><p className="muted">Agora você já pode configurar fotos, equipe e compartilhar seu link de agendamento.</p><a className="btn primary" href="/dashboard">Entrar no painel</a></div>}
+ </div>
+}

@@ -1,0 +1,23 @@
+"use client";
+import {useMemo,useState} from "react";
+type A={id:string;staff_id:string;starts_at:string;ends_at:string;status:string;price_cents:number;clients?:{name:string}|null;services?:{name:string}|null};
+type S={id:string;display_name:string;photo_url?:string|null};
+const statusLabel:Record<string,string>={confirmed:"Confirmado",arrived:"Chegou",in_service:"Em atendimento",completed:"Concluído",cancelled:"Cancelado",no_show:"No-show"};
+
+export function AppointmentBoard({initial,staff}:{initial:A[];staff:S[]}){
+ const [items,setItems]=useState(initial);const [view,setView]=useState<"day"|"week">("day");const [edit,setEdit]=useState<A|null>(null);const [busy,setBusy]=useState(false);const [message,setMessage]=useState("");
+ const grouped=useMemo(()=>staff.map(s=>({staff:s,items:items.filter(a=>a.staff_id===s.id).sort((a,b)=>a.starts_at.localeCompare(b.starts_at))})),[items,staff]);
+ async function setStatus(id:string,status:string){const r=await fetch("/api/appointments/status",{method:"PATCH",headers:{"content-type":"application/json"},body:JSON.stringify({id,status})});if(r.ok)setItems(x=>x.map(a=>a.id===id?{...a,status}:a))}
+ async function cancel(a:A){if(!confirm("Cancelar este agendamento?"))return;const r=await fetch(`/api/appointments/${a.id}`,{method:"PATCH",headers:{"content-type":"application/json"},body:JSON.stringify({action:"cancel"})});if(r.ok)setItems(x=>x.map(v=>v.id===a.id?{...v,status:"cancelled"}:v))}
+ async function reschedule(form:FormData){if(!edit)return;setBusy(true);setMessage("");const startsAt=new Date(`${form.get("date")}T${form.get("time")}:00`).toISOString();const r=await fetch(`/api/appointments/${edit.id}`,{method:"PATCH",headers:{"content-type":"application/json"},body:JSON.stringify({action:"reschedule",staffId:form.get("staff"),startsAt})});const j=await r.json();setBusy(false);if(r.ok){location.reload()}else setMessage(j.error==="TIME_ALREADY_BOOKED"?"Esse horário já foi ocupado.":"Não foi possível reagendar.")}
+ return <section className="card">
+  <div className="panelhead"><div><b>Agenda visual</b><div className="muted">Controle rápido do atendimento.</div></div><div className="segmented"><button className={view==="day"?"active":""} onClick={()=>setView("day")}>Dia</button><button className={view==="week"?"active":""} onClick={()=>setView("week")}>Semana</button></div></div>
+  {view==="day"?<div className="appointmentColumns">{grouped.map(g=><div className="appointmentColumn" key={g.staff.id}><div className="staffColumnHead"><div className="avatar">{g.staff.photo_url?<img src={g.staff.photo_url} alt={g.staff.display_name}/>:g.staff.display_name[0]}</div><b>{g.staff.display_name}</b></div>
+   {!g.items.length?<div className="emptySlot">Sem reservas</div>:g.items.map(a=><article className={`bookingCard status-${a.status}`} key={a.id}>
+    <div className="bookingTime">{new Date(a.starts_at).toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"})}</div><div><b>{a.clients?.name||"Cliente"}</b><span>{a.services?.name||"Serviço"}</span></div><strong>R$ {(a.price_cents/100).toFixed(2).replace(".",",")}</strong>
+    <select value={a.status} onChange={e=>setStatus(a.id,e.target.value)}>{["confirmed","arrived","in_service","completed","no_show","cancelled"].map(s=><option value={s} key={s}>{statusLabel[s]}</option>)}</select>
+    <div className="bookingActions"><button className="miniBtn" onClick={()=>setEdit(a)}>Reagendar</button><button className="miniBtn danger" onClick={()=>cancel(a)}>Cancelar</button></div>
+   </article>)}</div>)}</div>:<div className="weekBoard">{["Seg","Ter","Qua","Qui","Sex","Sáb","Dom"].map((d,i)=><div className="weekDay" key={d}><b>{d}</b><span className="muted">{items.filter(a=>((new Date(a.starts_at).getDay()+6)%7)===i&&!["cancelled"].includes(a.status)).length} reservas</span></div>)}</div>}
+  {edit&&<div className="modal open"><form className="dialog" action={reschedule}><h3>Reagendar</h3><p className="muted">{edit.clients?.name} · {edit.services?.name}</p><div className="form"><div className="field"><label>Profissional</label><select name="staff" defaultValue={edit.staff_id}>{staff.map(s=><option value={s.id} key={s.id}>{s.display_name}</option>)}</select></div><div className="twocol"><div className="field"><label>Nova data</label><input type="date" name="date" required/></div><div className="field"><label>Nova hora</label><input type="time" name="time" required/></div></div>{message&&<div className="errorBox">{message}</div>}<div className="dialogactions"><button type="button" className="btn" onClick={()=>setEdit(null)}>Voltar</button><button className="btn primary" disabled={busy}>{busy?"Reagendando...":"Confirmar"}</button></div></div></form></div>}
+ </section>
+}

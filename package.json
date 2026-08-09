@@ -1,0 +1,32 @@
+{
+  "name": "barberpro-saas-starter",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "test:unit": "node tests/unit/time-overlap.test.mjs",
+    "test:contracts": "node tests/integration/security.contract.test.mjs",
+    "test": "npm run test:unit && npm run test:contracts && npm run test:production && npm run test:source && npm run test:security",
+    "test:production": "node tests/integration/production.contract.test.mjs",
+    "typecheck": "tsc --noEmit",
+    "test:source": "node tests/integration/source-integrity.test.mjs",
+    "test:security": "node tests/security/public-booking-surface.test.mjs && node tests/security/rls-contract.test.mjs"
+  },
+  "dependencies": {
+    "@supabase/ssr": "^0.5.2",
+    "@supabase/supabase-js": "^2.45.4",
+    "lucide-react": "^0.468.0",
+    "next": "^15.1.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "typescript": "^5.7.0"
+  }
+}
