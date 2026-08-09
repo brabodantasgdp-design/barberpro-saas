@@ -1,6 +1,6 @@
 import { signIn, signUp } from "./actions";
 
-export default async function Login({searchParams}:{searchParams:Promise<{error?:string}>}){
+export default async function Login({searchParams}:{searchParams:Promise<{error?:string;message?:string}>}){
  const q=await searchParams;
  return <main className="authPage">
    <section className="authCard">
@@ -8,6 +8,7 @@ export default async function Login({searchParams}:{searchParams:Promise<{error?
      <h1>Entre na sua barbearia</h1>
      <p className="muted">Agenda, equipe e resultados em um só lugar.</p>
      {q.error && <div className="errorBox">Não foi possível concluir. Confira os dados e tente novamente.</div>}
+     {q.message==="confirme-email" && <div className="infoBox">Conta criada. Confirme o e-mail e depois entre no BarberPro.</div>}
      <form className="authForm">
        <label>E-mail<input name="email" type="email" required placeholder="voce@barbearia.com"/></label>
        <label>Senha<input name="password" type="password" required minLength={6} placeholder="••••••••"/></label>

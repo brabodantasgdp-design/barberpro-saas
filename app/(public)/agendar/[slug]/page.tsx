@@ -28,12 +28,10 @@ export default async function Booking({params}:{params:Promise<{slug:string}>}){
  }
 
  return <main className="public">
-   <div className="publicTopline"><span>BARBERPRO</span><span>AGENDE ONLINE</span></div>
    <section className="hero">
      <div className="avatar" style={{margin:"0 auto 14px",width:64,height:64}}>
        {shop.logo_url?<img src={shop.logo_url} alt="Logo"/>:shop.name[0]}
      </div>
-     <div className="eyebrow">Seu próximo visual começa aqui</div>
      <h1>{shop.name}</h1>
      <p className="muted">Agende seu horário sem criar conta.</p>
    </section>

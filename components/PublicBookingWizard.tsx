@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { EmptyState } from "@/components/EmptyState";
 
 type Service={id:string;name:string;duration_minutes:number;price_cents:number};
 type Staff={id:string;display_name:string;photo_url?:string|null};
@@ -75,7 +74,7 @@ export function PublicBookingWizard({
     </div>
 
     {step===1 && <div className="services">
-      {services.length===0?<EmptyState eyebrow="Agenda em preparação" title="A agenda ainda está sendo montada" description="Esta barbearia ainda não publicou serviços para reserva. Volte em breve."/>:services.map(s=><button key={s.id} className="card service serviceBtn" onClick={()=>{setService(s);setStep(2)}}>
+      {services.map(s=><button key={s.id} className="card service serviceBtn" onClick={()=>{setService(s);setStep(2)}}>
         <div><b>{s.name}</b><div className="muted">{s.duration_minutes} min</div></div>
         <b>R$ {(s.price_cents/100).toFixed(2).replace(".",",")}</b>
       </button>)}

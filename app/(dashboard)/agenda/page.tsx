@@ -5,7 +5,7 @@ import {AppointmentBoard} from "@/components/appointments/AppointmentBoard";
 import {ManualBookingDrawer} from "@/components/appointments/ManualBookingDrawer";
 
 export default async function Agenda(){
- const {supabase,membership}=await getCurrentMembership();if(!membership)return <div>Sem barbearia.</div>;
+ const {supabase,membership}=await getCurrentMembership();
  const {data:staff}=await supabase.from("shop_members").select("id,display_name,photo_url").eq("shop_id",membership.shop_id).order("display_name");
  const ids=(staff??[]).map(x=>x.id);
  const {data:rows}=ids.length?await supabase.from("work_schedules").select("staff_id,weekday,start_time,end_time").in("staff_id",ids):{data:[] as any[]};

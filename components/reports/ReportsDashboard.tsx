@@ -1,5 +1,3 @@
-import { EmptyState } from "@/components/EmptyState";
-
 type StaffRow={id:string;name:string;gross:number;count:number;commission:number};
 export function ReportsDashboard({gross,count,averageTicket,byStaff}:{gross:number;count:number;averageTicket:number;byStaff:StaffRow[]}){
  const fmt=(v:number)=>`R$ ${(v/100).toFixed(2).replace(".",",")}`;
@@ -13,7 +11,7 @@ export function ReportsDashboard({gross,count,averageTicket,byStaff}:{gross:numb
   </section>
   <section className="card"><div className="panelhead"><b>Por profissional</b></div><div className="reportTable">
    <div className="reportHead"><span>Profissional</span><span>Atendimentos</span><span>Produção</span><span>Comissão</span></div>
-   {byStaff.length===0?<EmptyState eyebrow="Primeiro ciclo" title="Relatórios após o primeiro atendimento" description="Quando a agenda começar a girar, você verá faturamento, ticket médio e comissão por profissional aqui." action="Abrir agenda" href="/agenda"/>:byStaff.map(x=><div className="reportRow" key={x.id}><b>{x.name}</b><span>{x.count}</span><span>{fmt(x.gross)}</span><strong>{fmt(x.commission)}</strong></div>)}
+   {byStaff.map(x=><div className="reportRow" key={x.id}><b>{x.name}</b><span>{x.count}</span><span>{fmt(x.gross)}</span><strong>{fmt(x.commission)}</strong></div>)}
   </div></section>
  </>
 }

@@ -3,7 +3,6 @@ import {ReportsDashboard} from "@/components/reports/ReportsDashboard";
 
 export default async function Relatorios(){
  const {supabase,membership}=await getCurrentMembership();
- if(!membership)return <div>Sem barbearia.</div>;
 
  const from=new Date();from.setDate(1);from.setHours(0,0,0,0);
  const {data}=await supabase.from("appointments")

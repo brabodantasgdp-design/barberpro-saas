@@ -3,7 +3,6 @@ import {getCurrentMembership} from "@/lib/auth";
 
 export default async function Cliente({params}:{params:Promise<{id:string}>}){
  const {id}=await params; const {supabase,membership}=await getCurrentMembership();
- if(!membership)return <div>Sem barbearia.</div>;
  const {data:c}=await supabase.from("clients").select("id,name,phone,email,notes").eq("id",id).eq("shop_id",membership.shop_id).single();
  if(!c)return <div>Cliente não encontrado.</div>;
  const {data:a}=await supabase.from("appointments")

@@ -22,5 +22,5 @@ export async function createShop(formData:FormData){
   p_name:name,p_slug:slug,p_owner_name:String(formData.get("ownerName")||"Proprietário"),p_phone:phone||null
  });
  if(error || !data) redirect("/onboarding?error=criar");
- redirect("/dashboard");
+ redirect("/onboarding");
 }

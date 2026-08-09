@@ -16,5 +16,6 @@ export async function getCurrentMembership(){
     .eq("user_id",user.id)
     .limit(1)
     .maybeSingle();
+  if(!data) redirect("/onboarding");
   return {supabase,user,membership:data};
 }

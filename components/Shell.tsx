@@ -1,39 +1,30 @@
-"use client";
-
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { BarChart3, CalendarDays, LayoutDashboard, Plus, Scissors, Settings2, Sparkles, UserRound, Users } from "lucide-react";
+import {getCurrentMembership} from "@/lib/auth";
+import {LogoutButton} from "@/components/auth/LogoutButton";
+import {ActiveNav} from "@/components/ActiveNav";
 
-const primaryNav = [
-  { href: "/dashboard", label: "Visão geral", icon: LayoutDashboard },
-  { href: "/agenda", label: "Agenda", icon: CalendarDays },
-  { href: "/clientes", label: "Clientes", icon: UserRound },
+const items=[
+ {icon:"◆",label:"Visão geral",href:"/dashboard"},
+ {icon:"▣",label:"Agenda",href:"/agenda"},
+ {icon:"♙",label:"Clientes",href:"/clientes"},
+ {icon:"✂",label:"Serviços",href:"/servicos"},
+ {icon:"♙",label:"Equipe",href:"/equipe"},
+ {icon:"◉",label:"Relatórios",href:"/relatorios"},
+ {icon:"⚙",label:"Configurações",href:"/configuracoes"},
 ];
-const studioNav = [
-  { href: "/servicos", label: "Serviços", icon: Scissors },
-  { href: "/equipe", label: "Equipe", icon: Users },
-  { href: "/relatorios", label: "Relatórios", icon: BarChart3 },
-  { href: "/configuracoes", label: "Configurações", icon: Settings2 },
-];
 
-function NavLink({ href, label, icon: Icon, pathname }: { href: string; label: string; icon: typeof LayoutDashboard; pathname: string }) {
-  const active = pathname === href || (href !== "/dashboard" && pathname.startsWith(`${href}/`));
-  return <Link className={active ? "active" : ""} href={href}><Icon size={17} strokeWidth={1.8} /><span>{label}</span></Link>;
-}
-
-export function Shell({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
-  return <div className="shell">
-    <aside className="sidebar">
-      <div className="brand"><span className="brandGlyph"><Sparkles size={15} /></span><span>BARBER<span>PRO</span></span></div>
-      <div className="workspaceSwitch"><span className="workspaceAvatar">B</span><span><small>Seu espaço</small><strong>Barbearia principal</strong></span><span className="workspaceDot" /></div>
-      <div className="navLabel">Operação</div>
-      <nav className="nav">{primaryNav.map(item => <NavLink key={item.href} {...item} pathname={pathname} />)}</nav>
-      <div className="navLabel navLabelSpaced">Gestão</div>
-      <nav className="nav">{studioNav.map(item => <NavLink key={item.href} {...item} pathname={pathname} />)}</nav>
-      <div className="sidebarFooter"><div className="proBadge"><Sparkles size={14} /><span><b>BarberPro Pro</b><small>Seu negócio, no controle.</small></span></div><Link href="/configuracoes" className="profileMini"><span className="avatar">B</span><span><b>Minha conta</b><small>Administrador</small></span></Link></div>
-    </aside>
-    <main className="main">{children}</main>
-    <nav className="bottom"><Link href="/dashboard"><LayoutDashboard size={18} /><span>Hoje</span></Link><Link href="/agenda"><CalendarDays size={18} /><span>Agenda</span></Link><Link className="plus" href="/agenda"><Plus size={22} /></Link><Link href="/clientes"><UserRound size={18} /><span>Clientes</span></Link><Link href="/equipe"><Users size={18} /><span>Equipe</span></Link></nav>
-  </div>;
+export async function Shell({children}:{children:React.ReactNode}){
+ const {membership}=await getCurrentMembership();
+ const member=membership as any;
+ const shop=member?.shops;
+ return <div className="shell premiumShell">
+  <aside className="sidebar premiumSidebar">
+   <div className="brand premiumBrand"><i>B</i><span>BARBER<b>PRO</b><small>SISTEMA PREMIUM PARA BARBEARIAS</small></span></div>
+   <div className="shopIdentity"><div className="avatar">{String(shop?.name||"B")[0]}</div><span><b>{shop?.name||"Barbearia"}</b><small>Premium Barbershop</small></span><em>⌄</em></div>
+   <ActiveNav items={items}/>
+   <div className="sidebarUser"><div><div className="avatar">{String(member?.display_name||"P")[0]}</div><span><b>{member?.display_name||"Proprietário"}</b><small>{member?.role==="owner"?"Proprietário":member?.role}</small></span></div><LogoutButton/></div>
+  </aside>
+  <main className="main premiumMain">{children}</main>
+  <nav className="bottom premiumBottom"><Link href="/dashboard">◆<br/>Hoje</Link><Link href="/agenda">▣<br/>Agenda</Link><Link className="plus" href="/agenda">+</Link><Link href="/clientes">♙<br/>Clientes</Link><LogoutButton compact/></nav>
+ </div>;
 }
