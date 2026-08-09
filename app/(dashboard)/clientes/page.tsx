@@ -1,5 +1,6 @@
 import Link from "next/link";
 import {getCurrentMembership} from "@/lib/auth";
+import { EmptyState } from "@/components/EmptyState";
 
 export default async function Clientes(){
  const {supabase,membership}=await getCurrentMembership();
@@ -9,13 +10,13 @@ export default async function Clientes(){
   .eq("shop_id",membership.shop_id).order("name");
  return <>
   <div className="top"><div><h1>Clientes</h1><div className="muted">Histórico e relacionamento em um só lugar.</div></div></div>
-  <div className="clientGrid">{(data??[]).map((c:any)=>{
+  {(data??[]).length===0?<div className="card"><EmptyState eyebrow="Base de clientes" title="Seus clientes aparecem aqui" description="Assim que o primeiro agendamento for concluído, o histórico e o valor gerado ficam organizados nesta tela." action="Ver agenda" href="/agenda"/></div>:<div className="clientGrid">{(data??[]).map((c:any)=>{
    const valid=(c.appointments??[]).filter((a:any)=>!["cancelled","no_show"].includes(a.status));
    const total=valid.reduce((s:number,a:any)=>s+(a.price_cents??0),0);
    return <Link href={`/clientes/${c.id}`} className="card clientCard" key={c.id}>
     <div className="avatar large">{c.name?.[0]||"C"}</div><div><b>{c.name}</b><span>{c.phone}</span></div>
     <div className="clientStats"><span><small>Visitas</small><strong>{valid.length}</strong></span><span><small>Total</small><strong>R$ {(total/100).toFixed(2).replace(".",",")}</strong></span></div>
    </Link>
-  })}</div>
+  })}</div>}
  </>;
 }

@@ -1,5 +1,6 @@
 "use client";
 import {useState} from "react";
+import { EmptyState } from "@/components/EmptyState";
 type Person={id:string;display_name:string;photo_url?:string|null;role:string;commission_percent:number;can_block_time:boolean;block_requires_approval:boolean};
 export function TeamManager({initial}:{initial:Person[]}){
  const [people,setPeople]=useState(initial); const [editing,setEditing]=useState<Person|null>(null); const [inviteOpen,setInviteOpen]=useState(false); const [busy,setBusy]=useState(false);
@@ -15,11 +16,11 @@ export function TeamManager({initial}:{initial:Person[]}){
  }
  return <>
   <div className="top" style={{marginBottom:18}}><div><h1>Equipe</h1><div className="muted">Acesso, foto, comissão e autonomia.</div></div><button className="btn primary" onClick={()=>setInviteOpen(true)}>+ Convidar</button></div>
-  <div className="teamCards">{people.map(p=><article className="card teamCard" key={p.id}>
+  {people.length===0?<div className="card"><EmptyState eyebrow="Time da casa" title="Convide seu primeiro profissional" description="Uma equipe completa deixa a agenda mais flexível e o acompanhamento de comissão mais claro." action="Convidar profissional" href="#invite"/></div>:<div className="teamCards">{people.map(p=><article className="card teamCard" key={p.id}>
    <label className="photoPicker"><div className="avatar large">{p.photo_url?<img src={p.photo_url} alt={p.display_name}/>:p.display_name[0]}</div><input hidden type="file" accept="image/*" onChange={e=>e.target.files?.[0]&&uploadPhoto(p.id,e.target.files[0])}/><span>Trocar foto</span></label>
    <div className="teamInfo"><b>{p.display_name}</b><span>{p.role}</span><div className="teamNumbers"><div><small>Comissão</small><strong>{p.commission_percent}%</strong></div><div><small>Bloqueio</small><strong>{p.can_block_time?(p.block_requires_approval?"Aprovação":"Livre"):"Desativado"}</strong></div></div></div>
    <button className="btn" onClick={()=>setEditing(p)}>Editar perfil</button>
-  </article>)}</div>
+  </article>)}</div>}
 
   {editing&&<div className="modal open"><form className="dialog" action={saveMember}><h3>Editar funcionário</h3><div className="form">
    <div className="field"><label>Nome</label><input name="name" defaultValue={editing.display_name}/></div>

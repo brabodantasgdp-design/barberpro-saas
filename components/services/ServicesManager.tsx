@@ -1,5 +1,6 @@
 "use client";
 import {useState} from "react";
+import { EmptyState } from "@/components/EmptyState";
 type Service={id:string;name:string;duration_minutes:number;buffer_minutes:number;price_cents:number;active:boolean};
 export function ServicesManager({shopId,initial}:{shopId:string;initial:Service[]}){
  const [items,setItems]=useState(initial);const [open,setOpen]=useState(false);const [edit,setEdit]=useState<Service|null>(null);
@@ -8,7 +9,7 @@ export function ServicesManager({shopId,initial}:{shopId:string;initial:Service[
  async function remove(id:string){const r=await fetch(`/api/services/${id}`,{method:"DELETE"});if(r.ok)setItems(x=>x.filter(s=>s.id!==id))}
  return <>
   <div className="top"><div><h1>Serviços</h1><div className="muted">Preço, duração e intervalo entre clientes.</div></div><button className="btn primary" onClick={()=>setOpen(true)}>+ Serviço</button></div>
-  <div className="serviceAdminGrid">{items.map(s=><article className="card serviceAdmin" key={s.id}><div><b>{s.name}</b><div className="muted">{s.duration_minutes} min + {s.buffer_minutes} min de intervalo</div></div><strong>R$ {(s.price_cents/100).toFixed(2).replace(".",",")}</strong><div><button className="btn" onClick={()=>setEdit(s)}>Editar</button> <button className="btn" onClick={()=>remove(s.id)}>Arquivar</button></div></article>)}</div>
+  {items.length===0?<div className="card"><EmptyState eyebrow="Catálogo vazio" title="Crie seu primeiro serviço" description="Defina nome, duração e preço para que seus clientes possam reservar um horário." action="Adicionar serviço" href="#service"/></div>:<div className="serviceAdminGrid">{items.map(s=><article className="card serviceAdmin" key={s.id}><div><b>{s.name}</b><div className="muted">{s.duration_minutes} min + {s.buffer_minutes} min de intervalo</div></div><strong>R$ {(s.price_cents/100).toFixed(2).replace(".",",")}</strong><div><button className="btn" onClick={()=>setEdit(s)}>Editar</button> <button className="btn" onClick={()=>remove(s.id)}>Arquivar</button></div></article>)}</div>}
   {(open||edit)&&<div className="modal open"><form className="dialog" action={edit?update:create}><h3>{edit?"Editar serviço":"Novo serviço"}</h3><div className="form">
    <div className="field"><label>Nome</label><input name="name" required defaultValue={edit?.name}/></div>
    <div className="twocol"><div className="field"><label>Duração</label><input name="duration" type="number" min="5" required defaultValue={edit?.duration_minutes||30}/></div><div className="field"><label>Buffer</label><input name="buffer" type="number" min="0" defaultValue={edit?.buffer_minutes||5}/></div></div>
