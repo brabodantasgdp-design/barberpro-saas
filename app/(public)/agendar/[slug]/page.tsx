@@ -6,7 +6,8 @@ export default async function Booking({params}:{params:Promise<{slug:string}>}){
  const {slug}=await params;
  const supabase=createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+  {global:{fetch:(input,init)=>fetch(input,{...init,signal:AbortSignal.timeout(8000)})}}
  );
 
  const {data:shop}=await supabase.from("public_shops").select("*").eq("slug",slug).maybeSingle();
